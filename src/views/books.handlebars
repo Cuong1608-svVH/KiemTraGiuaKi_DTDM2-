@@ -1,0 +1,195 @@
+<div class="container page-content">
+
+  <!-- Alert Messages -->
+  {{#if errorMessage}}
+  <div class="alert alert-danger animate-fade-in">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-text">
+      <strong>Từ chối xử lý:</strong> {{errorMessage}}
+    </div>
+  </div>
+  {{/if}}
+
+  {{#if successMessage}}
+  <div class="alert alert-success animate-fade-in">
+    <div class="alert-icon">✅</div>
+    <div class="alert-text">
+      {{successMessage}}
+    </div>
+  </div>
+  {{/if}}
+
+  <!-- Session Metric Bar -->
+  <div class="session-bar">
+    <div class="session-metric">
+      <span class="metric-icon">🔄</span>
+      <span><strong>Stateless Session:</strong> Lưu trữ tập trung tại Cloud MongoDB Atlas</span>
+    </div>
+    {{#if sessionViews}}
+    <div class="session-metric">
+      <span class="metric-icon">👁️</span>
+      <span>Lượt truy cập phiên này: <strong>{{sessionViews}}</strong> lần</span>
+    </div>
+    {{/if}}
+  </div>
+
+  <div class="grid-layout">
+    <!-- Cột bên trái: Form thêm mới sách (Ghi dữ liệu) -->
+    <section class="card form-card">
+      <div class="card-header">
+        <div class="header-icon-box write-icon">✍️</div>
+        <div>
+          <h2 class="card-title">Thêm Sách Mới</h2>
+          <p class="card-desc">Thao tác định tuyến qua: <strong>Write Connection</strong> (user_write)</p>
+        </div>
+      </div>
+
+      <form action="/books" method="POST" id="addBookForm" class="book-form">
+        <div class="form-group">
+          <label for="bookCode" class="form-label">
+            Mã sản phẩm <span class="required">*</span>
+            <span class="tag-hint">Tiền tố bắt buộc: <strong>{{requiredPrefix}}</strong></span>
+          </label>
+          <input 
+            type="text" 
+            id="bookCode" 
+            name="bookCode" 
+            class="form-control" 
+            placeholder="Ví dụ: {{requiredPrefix}}-CLOUD-01" 
+            required 
+            autocomplete="off"
+          />
+          <small class="form-help">Mã sách phải bắt đầu bằng 3 số cuối MSSV: <code>{{requiredPrefix}}</code></small>
+        </div>
+
+        <div class="form-group">
+          <label for="title" class="form-label">Tên sách <span class="required">*</span></label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            class="form-control" 
+            placeholder="Nhập tên cuốn sách..." 
+            required 
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group col-half">
+            <label for="author" class="form-label">Tác giả <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="author" 
+              name="author" 
+              class="form-control" 
+              placeholder="Tên tác giả..." 
+              required 
+            />
+          </div>
+
+          <div class="form-group col-half">
+            <label for="category" class="form-label">Thể loại</label>
+            <select id="category" name="category" class="form-control">
+              <option value="Điện toán đám mây">Điện toán đám mây</option>
+              <option value="Kiến trúc phần mềm">Kiến trúc phần mềm</option>
+              <option value="DevOps & CI/CD">DevOps & CI/CD</option>
+              <option value="Cơ sở dữ liệu NoSQL">Cơ sở dữ liệu NoSQL</option>
+              <option value="Lập trình Web">Lập trình Web</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="price" class="form-label">Giá gốc (VNĐ) <span class="required">*</span></label>
+          <div class="input-prefix-wrapper">
+            <input 
+              type="number" 
+              id="price" 
+              name="price" 
+              class="form-control" 
+              placeholder="100000" 
+              min="0" 
+              step="1000"
+              required 
+            />
+            <span class="currency-tag">VNĐ</span>
+          </div>
+        </div>
+
+        <!-- Box tính toán VAT động trực quan -->
+        <div class="vat-calculator-box">
+          <div class="vat-calc-header">
+            <span>🧮 Tính toán tự động theo MSSV {{studentId}}:</span>
+            <span class="vat-rate-badge">VAT: {{vatRate}}%</span>
+          </div>
+          <div class="vat-calc-formula">
+            <code>VAT = (Chữ số cuối MSSV + 4)% = (1 + 4)% = 5%</code>
+          </div>
+          <div class="vat-calc-result">
+            <span>Giá sau thuế dự kiến:</span>
+            <strong id="previewFinalPrice" class="preview-price">0 VNĐ</strong>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <span class="btn-icon">💾</span> Lưu Sách Xuống Cloud MongoDB
+        </button>
+      </form>
+    </section>
+
+    <!-- Cột bên phải: Bảng danh sách sách (Đọc dữ liệu) -->
+    <section class="card table-card">
+      <div class="card-header">
+        <div class="header-icon-box read-icon">📖</div>
+        <div>
+          <h2 class="card-title">Danh Sách Sách Trên Cloud</h2>
+          <p class="card-desc">Thao tác định tuyến qua: <strong>Read Connection</strong> (user_read) &bull; Tổng: <strong>{{totalBooks}}</strong> cuốn</p>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        {{#if books.length}}
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Mã SP</th>
+              <th>Tên Sách</th>
+              <th>Tác Giả</th>
+              <th>Giá Gốc</th>
+              <th>Thuế (VAT)</th>
+              <th>Giá Sau Thuế</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each books}}
+            <tr>
+              <td>
+                <span class="code-badge">{{this.bookCode}}</span>
+              </td>
+              <td>
+                <div class="book-name">{{this.title}}</div>
+                <div class="book-category">{{this.category}}</div>
+              </td>
+              <td>{{this.author}}</td>
+              <td class="text-muted">{{this.formattedPrice}} đ</td>
+              <td>
+                <span class="vat-tag">+{{this.vatRate}}%</span>
+              </td>
+              <td>
+                <span class="final-price">{{this.formattedFinalPrice}} đ</span>
+              </td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{else}}
+        <div class="empty-state">
+          <div class="empty-icon">📚</div>
+          <h3>Chưa có sách nào trên cơ sở dữ liệu</h3>
+          <p>Hãy thêm cuốn sách đầu tiên bằng biểu mẫu bên trái. Lưu ý mã sách bắt buộc phải bắt đầu bằng <strong>{{requiredPrefix}}</strong>!</p>
+        </div>
+        {{/if}}
+      </div>
+    </section>
+  </div>
+</div>
