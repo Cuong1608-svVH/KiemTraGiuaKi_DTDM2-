@@ -6,6 +6,10 @@ require('dotenv').config();
 // Khởi tạo kết nối cơ sở dữ liệu MongoDB Atlas (Dual Connection)
 require('./config/database');
 
+// Cấu hình Stateless Session trên Cloud MongoDB Atlas
+const sessionConfig = require('./config/session');
+const sessionMiddleware = require('./middlewares/sessionMiddleware');
+
 const bookRoutes = require('./routes/bookRoutes');
 
 const app = express();
@@ -16,7 +20,6 @@ app.engine('handlebars', engine({
   defaultLayout: 'main',
   layoutsDir: path.join(__dirname, 'views', 'layouts'),
   helpers: {
-    // Helper tùy chỉnh nếu cần trong Handlebars
     eq: (a, b) => a === b
   }
 }));
@@ -27,6 +30,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Đăng ký Stateless Session & Session Tracking Middleware
+app.use(sessionConfig);
+app.use(sessionMiddleware);
 
 // Đăng ký các tuyến đường (Routes)
 app.use('/', bookRoutes);
