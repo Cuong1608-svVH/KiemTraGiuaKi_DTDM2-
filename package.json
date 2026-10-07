@@ -1,0 +1,25 @@
+{
+  "name": "book-management-cloud",
+  "version": "1.0.0",
+  "description": "Ứng dụng Quản lý Sách trên Cloud - Bảo mật Least Privilege, Stateless Architecture & DevOps",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "keywords": [
+    "cloud-computing",
+    "mongodb-atlas",
+    "stateless-session",
+    "least-privilege"
+  ],
+  "author": "Nguyễn Văn Cường (23IT.B021)",
+  "license": "ISC",
+  "dependencies": {
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-handlebars": "^8.0.1",
+    "mongoose": "^8.9.5"
+  }
+}
