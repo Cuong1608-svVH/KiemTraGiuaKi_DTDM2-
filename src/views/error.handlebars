@@ -1,0 +1,11 @@
+<div class="container page-content">
+  <div class="card error-card animate-fade-in">
+    <div class="error-icon">⚠️</div>
+    <h2>Đã xảy ra lỗi hệ thống</h2>
+    <p class="error-msg">{{message}}</p>
+    {{#if error}}
+    <pre class="error-stack"><code>{{error}}</code></pre>
+    {{/if}}
+    <a href="/" class="btn btn-primary" style="margin-top: 20px;">Quay lại trang chủ</a>
+  </div>
+</div>
