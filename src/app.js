@@ -15,6 +15,9 @@ const bookRoutes = require('./routes/bookRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Cấu hình Trust Proxy để hoạt động chính xác sau reverse proxy (Render PaaS)
+app.set('trust proxy', 1);
+
 // Cấu hình Template Engine Handlebars
 app.engine('handlebars', engine({
   defaultLayout: 'main',
